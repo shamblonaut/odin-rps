@@ -1,2 +1,2 @@
 # odin-rps
-A javascript console game of Rock, Paper, Scissors
+An interactive game of Rock, Paper, Scissors made with javascript

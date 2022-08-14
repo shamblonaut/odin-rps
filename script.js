@@ -28,57 +28,108 @@ function playRound(playerSelection, computerSelection) {
 	if (playerSelection === 'rock') {
 		switch (computerSelection) {
 			case 'rock':
-				return 'Draw!';
+				return 'The round was a draw!';
 			case 'paper':
-				return 'You lose! Paper beats Rock';
+				return 'You lose the round! Paper beats Rock';
 			case 'scissors':
-				return 'You win! Rock beats Scissors';
+				return 'You win the round! Rock beats Scissors';
 		}
 	} else if (playerSelection === 'paper') {
 		switch (computerSelection) {
 			case 'rock':
-				return 'You win! Paper beats Rock';
+				return 'You win the round! Paper beats Rock';
 			case 'paper':
-				return 'Draw!';
+				return 'The round was a draw!';
 			case 'scissors':
-				return 'You lose! Scissors beat Paper';
+				return 'You lose the round! Scissors beat Paper';
 		}
 	}  else if (playerSelection === 'scissors') {
 		switch (computerSelection) {
 			case 'rock':
-				return 'You lose! Rock beats Scissors';
+				return 'You lose the round! Rock beats Scissors';
 			case 'paper':
-				return 'You win! Scissors beat Paper';
+				return 'You win the round! Scissors beat Paper';
 			case 'scissors':
-				return 'Draw!';
+				return 'The round was a draw!';
 		}
 	}
 }
 
 // Play given number of rounds of Rock Paper Scissors
-function game(rounds) {
-	let playerScore = 0;
-	let computerScore = 0;
+const buttons = document.querySelector('.buttons');
+const selections = document.querySelectorAll('.selection');
+const infoDisplay = document.querySelector('.info');
+const roundDisplay = document.querySelector('.round');
+const playerScoreDisplay = document.querySelector('.player > .points');
+const computerScoreDisplay = document.querySelector('.computer > .points');
+const roundResultDisplay = document.querySelector('.result');
 
-	for(let i = 0; i < rounds; i++) {
-		let roundResult = playRound(getPlayerChoice(), getComputerChoice());
-		console.log(roundResult);
-
-		if (roundResult.includes('win')) {
-			playerScore++;
-		} else if (roundResult.includes('lose')) {
-			computerScore++;
+function displayResult(playerScore, computerScore, roundResult) {
+	if(playerScore >= 5 || computerScore >= 5) {
+		if (playerScore > computerScore) {
+			roundResultDisplay.textContent = `You win the game with ${playerScore} points!`;
+		} else if(computerScore > playerScore) {
+			roundResultDisplay.textContent = `Computer wins the game with ${computerScore} points!`;
 		}
-	}
 
-	if (playerScore > computerScore) {
-		console.log(`You win with ${playerScore} points!`);
-	} else if(computerScore > playerScore) {
-		console.log(`Computer wins with ${computerScore} points!`);
+		console.log(roundResultDisplay.textContent);
+
+		selections.forEach((selection) => {
+			buttons.removeChild(selection);
+		});
+
+		const restartButton = document.createElement('button');
+		restartButton.classList.add('selection');
+		restartButton.textContent = 'Restart';
+		restartButton.addEventListener('click', () => {
+			restartButton.classList.add('selected');
+			window.location.reload();
+		});
+		restartButton.addEventListener('transitionend', (event) => {
+			if (event.propertyName === 'transform') {
+				restartButton.classList.remove('selected');
+			}
+		});
+		buttons.appendChild(restartButton);
 	} else {
-		console.log(`The game was a draw with ${playerScore} points for you and ${computerScore} points for Computer!`)
+		roundResultDisplay.textContent = roundResult;
 	}
 }
 
-// Play the game
-game(5);
+function playGame(selection) {
+	selection.classList.add('selected');
+
+	let roundResult = playRound(selection.getAttribute('id'), getComputerChoice());
+	console.log(roundResult);
+
+	if (roundResult.includes('win')) {
+		playerScore++;
+	} else if (roundResult.includes('lose')) {
+		computerScore++;
+	}
+	
+	playerScoreDisplay.textContent = playerScore;
+	computerScoreDisplay.textContent = computerScore;
+	displayResult(playerScore, computerScore, roundResult);
+
+	round++;
+	roundDisplay.textContent = `Round ${round}`;
+}
+
+let playerScore = 0;
+let computerScore = 0;
+
+let round = 1;
+roundDisplay.textContent = `Round ${round}`;
+
+selections.forEach((selection) => {
+	selection.addEventListener('click', () => {
+		if (playerScore < 5 && computerScore < 5) playGame(selection);
+	});
+	
+	selection.addEventListener('transitionend', (event) => {
+		if (event.propertyName === 'transform') {
+			selection.classList.remove('selected');
+		}
+	});
+});
